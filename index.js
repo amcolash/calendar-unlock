@@ -31,6 +31,10 @@ app.post('/cal', async (req, res) => {
   }
 });
 
+app.get('/', (req, res) => {
+  res.send('Please POST to the /cal endpoint to update and GET from /filename.ical');
+});
+
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);
 });

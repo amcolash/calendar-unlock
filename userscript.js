@@ -18,6 +18,8 @@
     const id = 'YW1jb2xhc2hAc2FsZXNmb3JjZS5jb20';
     const url = `https://calendar.google.com/calendar/u/1/exporticalzip?cexp=${id}`;
 
+    const server = 'http://amcolash.com:8002/cal';
+
     // Grab an export of calendar from gmail
     axios
       .get(url)
@@ -29,7 +31,7 @@
         console.log(blob);
 
         // Send it to the server to update the hosted calendar
-        axios.post('http://localhost:3000/cal', response.data, { headers: { 'content-type': 'application/zip' } });
+        axios.post(server, response.data, { headers: { 'content-type': 'application/zip' } });
       })
       .catch((err) => {
         console.error(err);
@@ -38,5 +40,8 @@
 
   // Run this every 5 minutes while the tab is open
   const timeout = 5 * 60 * 1000;
-  setTimeout(timeout, getEvents);
+  setInterval(timeout, getEvents);
+
+  // Get events immediately
+  getEvents();
 })();
