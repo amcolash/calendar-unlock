@@ -1,2 +1,3 @@
 # calendar-unlock
-Sick of Salesforce removing outlook and calendar access? *Purely educational* ;P
+
+Sick of SF removing outlook and calendar access? *Purely educational* ;P

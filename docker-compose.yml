@@ -1,0 +1,11 @@
+version: '2'
+services:
+  sunrise:
+    image: amcolash/calendar-unlock
+    build: ./
+    container_name: calendar-unlock
+    restart: unless-stopped
+    ports:
+      - 8002:8002
+    network_mode: 'host'
+    entrypoint: npm start
