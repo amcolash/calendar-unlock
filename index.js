@@ -52,9 +52,11 @@ app.post('/cal', async (req, res) => {
     // Remove temp file
     await fs.promises.unlink(file);
 
+    console.log(`${new Date().toLocaleString()}: Calendar file updated`);
+
     res.sendStatus(200);
   } catch (err) {
-    console.error(err);
+    console.error(`${new Date().toLocaleString()}: ${err}`);
     res.sendStatus(500);
   }
 });

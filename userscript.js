@@ -15,21 +15,21 @@
   'use strict';
 
   function getEvents() {
+    console.log(`${new Date().toLocaleString()}: Updating events`);
+
     const id = 'YW1jb2xhc2hAc2FsZXNmb3JjZS5jb20';
     const url = `https://calendar.google.com/calendar/u/1/exporticalzip?cexp=${id}`;
 
-    const server = 'http://amcolash.com:8002/cal';
+    const server = 'https://localhost:8002/cal';
+    //const server = 'https://home.amcolash.com:8002/cal';
 
     // Grab an export of calendar from gmail
-    axios
-      .get(url)
+    axios({
+      url,
+      method: 'GET',
+      responseType: 'blob',
+    })
       .then((response) => {
-        console.log(response);
-
-        // Turn it into a blob
-        const blob = new Blob([JSON.stringify(response.data)], { type: 'application/zip' });
-        console.log(blob);
-
         // Send it to the server to update the hosted calendar
         axios.post(server, response.data, { headers: { 'content-type': 'application/zip' } });
       })
@@ -40,7 +40,7 @@
 
   // Run this every 5 minutes while the tab is open
   const timeout = 5 * 60 * 1000;
-  setInterval(timeout, getEvents);
+  setInterval(getEvents, timeout);
 
   // Get events immediately
   getEvents();
