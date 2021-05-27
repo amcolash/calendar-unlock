@@ -8,7 +8,7 @@ const path = require('path');
 const PORT = 8002;
 const app = express();
 
-app.use(bodyParser.raw({ type: 'application/zip' }));
+app.use(bodyParser.raw({ type: 'application/zip', limit: '50mb' }));
 app.use(cors());
 app.use(express.static('public'));
 
