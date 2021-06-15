@@ -5,8 +5,6 @@ services:
     build: ./
     container_name: calendar-unlock
     restart: unless-stopped
-    ports:
-      - 8002:8002
     network_mode: 'host'
     volumes:
       - ./.cert:/usr/src/app/.cert
