@@ -58,7 +58,7 @@ app.post('/cal', async (req, res) => {
       },
     });
 
-    // There should only ever be one file in the zip, so this shouldn't be a concurrency issue
+    // There should only ever be one file in the zip, so this shouldn't be a concurrency issue (assuming just me using it)
     files.forEach(async (f) => {
       const calFile = path.join(public, f);
 
@@ -69,7 +69,7 @@ app.post('/cal', async (req, res) => {
       try {
         // Run python script to filter out old events
         const python = await spawn('python3', [path.join(__dirname, 'icalfilter.py')]);
-        // console.log(pythom.toString())
+        console.log(python.toString());
 
         // Remove temp file and rename output back to original name
         await fs.promises.unlink(path.join(public, 'in.ics'));

@@ -4,6 +4,7 @@ import pytz
 utc = pytz.utc
 
 YEAR = datetime.date.today().year
+USER = 'amcolash@salesforce.com'
 
 def main():
   with open('public/in.ics', 'r', encoding='utf-8') as f:
@@ -14,6 +15,24 @@ def main():
       outcal.add(name, value)
 
     def active_event(item):
+      # Check if the event was declined
+
+      # Get attendees for event
+      attendees = item.get('ATTENDEE')
+
+      # If there is only one attendee, check it
+      if attendees and hasattr(attendees, 'params'):
+        if attendees.params['CN'] == USER and attendees.params['PARTSTAT'] == 'DECLINED':
+          # print(attendees.params)
+          return False
+      # If there are multiple, check each individually
+      elif attendees and len(attendees) > 0:
+        for a in attendees:
+          if hasattr(a, 'params'):
+            if a.params['CN'] == USER and a.params['PARTSTAT'] == 'DECLINED':
+              # print(a.params)
+              return False
+
       start_date = item['dtstart'].dt
 
       # recurrent
