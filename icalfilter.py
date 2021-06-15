@@ -5,6 +5,7 @@ utc = pytz.utc
 
 YEAR = datetime.date.today().year
 USER = 'amcolash@salesforce.com'
+FILTER = [ 'Lunch', 'Meeting Free Friday', 'Formatting Meeting-Free Friday', 'Project Time' ]
 
 def main():
   with open('public/in.ics', 'r', encoding='utf-8') as f:
@@ -32,6 +33,11 @@ def main():
             if a.params['CN'] == USER and a.params['PARTSTAT'] == 'DECLINED':
               # print(a.params)
               return False
+
+      # Filter out some events by event name
+      for f in FILTER:
+        if item['SUMMARY'] == f:
+          return False
 
       start_date = item['dtstart'].dt
 
