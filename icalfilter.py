@@ -5,7 +5,7 @@ utc = pytz.utc
 
 YEAR = datetime.date.today().year
 USER = 'amcolash@salesforce.com'
-FILTER = [ 'Lunch', 'Meeting Free Friday', 'Formatting Meeting-Free Friday', 'Project Time' ]
+FILTER = [ 'Lunch', 'Meeting Free Friday', 'Formatting Meeting-Free Friday', 'Project Time', 'Formatting Retrospective', 'Formatting Standup', 'Formatting Sprint Review' ]
 
 def main():
   with open('public/in.ics', 'r', encoding='utf-8') as f:
