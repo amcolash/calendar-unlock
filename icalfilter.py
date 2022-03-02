@@ -7,6 +7,7 @@ YEAR = datetime.date.today().year
 USER = 'amcolash@salesforce.com'
 FILTER = [ 'Lunch', 'Meeting Free Friday', 'Formatting Meeting-Free Friday', 'Project Time', 'Formatting Retrospective', 'Formatting Standup', 'Formatting Sprint Review' ]
 
+
 def main():
   with open('public/in.ics', 'r', encoding='utf-8') as f:
     cal = icalendar.Calendar.from_ical(f.read())
@@ -73,10 +74,10 @@ def main():
       if item.name == 'VEVENT':
         start_date = item['dtstart'].dt
         if active_event(item):
-          print ('INCLUDE', item['summary'], repr(start_date))
+          print('INCLUDE', item['summary'], repr(start_date))
           outcal.add_component(item)
         else:
-          print ('EXCLUDE', item['summary'], repr(start_date))
+          print('EXCLUDE', item['summary'], repr(start_date))
           pass
       else:
         outcal.add_component(item)

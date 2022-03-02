@@ -1,6 +1,6 @@
 version: '2'
 services:
-  sunrise:
+  calendar-unlock:
     image: amcolash/calendar-unlock
     build: ./
     container_name: calendar-unlock

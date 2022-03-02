@@ -9,6 +9,10 @@ const spawn = require('await-spawn');
 const PORT = 8002;
 const app = express();
 
+// Make public dir if it doesn't exist
+if (!fs.existsSync('public')) fs.mkdirSync('public');
+
+// Set up express server
 app.use(bodyParser.raw({ type: 'application/zip', limit: '50mb' }));
 app.use(cors());
 app.use(express.static('public'));
@@ -59,7 +63,7 @@ app.post('/cal', async (req, res) => {
     });
 
     // There should only ever be one file in the zip, so this shouldn't be a concurrency issue (assuming just me using it)
-    files.forEach(async (f) => {
+    for (f of files) {
       const calFile = path.join(public, f);
 
       // Copy original file and rename original to use with python script
@@ -75,9 +79,9 @@ app.post('/cal', async (req, res) => {
         await fs.promises.unlink(path.join(public, 'in.ics'));
         await fs.promises.rename(path.join(public, 'out.ics'), calFile);
       } catch (e) {
-        console.log(e);
+        console.log('Error in ical processing, exit:', e.code, '\n', e.stdout.toString(), e.stderr.toString());
       }
-    });
+    }
 
     // Remove temp file
     await fs.promises.unlink(file);
