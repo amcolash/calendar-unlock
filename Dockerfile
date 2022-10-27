@@ -1,5 +1,5 @@
-# Dependency Stage
-FROM mhart/alpine-node:14
+# Use node 16
+FROM node:16-alpine
 
 # Install python3, pip and dependencies for icalfilter
 RUN apk add --update --no-cache python3 && python3 -m ensurepip
