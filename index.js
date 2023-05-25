@@ -4,7 +4,7 @@ const express = require('express');
 const extractZip = require('extract-zip');
 const fs = require('fs');
 const path = require('path');
-const spawn = require('await-spawn');
+const ICAL = require('ical.js');
 
 const PORT = 8002;
 const app = express();
@@ -64,21 +64,17 @@ app.post('/cal', async (req, res) => {
       const calFile = path.join(public, f);
 
       // Copy original file and rename original to use with python script
-      await fs.promises.copyFile(calFile, calFile.replace('.ics', '_orig.ics'));
-      await fs.promises.rename(calFile, path.join(public, 'in.ics'));
+      const backup = calFile.replace('.ics', '_orig.ics');
+      await fs.promises.copyFile(calFile, backup);
 
       try {
-        // Run python script to filter out old events
-        const python = await spawn('python3', [path.join(__dirname, 'icalfilter.py')]);
-        console.log(python.toString());
-
-        // Remove temp file and rename output back to original name
-        await fs.promises.unlink(path.join(public, 'in.ics'));
-        await fs.promises.rename(path.join(public, 'out.ics'), calFile);
+        await filterIcal(calFile);
       } catch (e) {
         // If things fail, just rename the original file back
-        console.log('Error in ical processing, exit:', e.code, '\n', e.stdout.toString(), e.stderr.toString());
-        await fs.promises.rename(path.join(public, 'in.ics'), calFile);
+        console.log('Error in ical processing, exit:', e, e.stack);
+        await fs.promises.rename(backup, calFile);
+      } finally {
+        await fs.promises.rm(backup);
       }
     }
 
@@ -89,7 +85,7 @@ app.post('/cal', async (req, res) => {
 
     res.sendStatus(200);
   } catch (err) {
-    console.error(`${new Date().toLocaleString()}: ${err}`);
+    console.error(`${new Date().toLocaleString()}: ${err}\n${err.stack}`);
     res.sendStatus(500);
   }
 });
@@ -97,3 +93,43 @@ app.post('/cal', async (req, res) => {
 app.get('/', (req, res) => {
   res.send('Please POST to the /cal endpoint to update and GET from /filename.ical');
 });
+
+/** Filtering code */
+
+const user = 'amcolash@salesforce.com';
+const filter = ['Lunch'];
+
+async function filterIcal(file) {
+  const data = fs.readFileSync(file, 'utf8');
+
+  const ical = ICAL.parse(data);
+
+  console.log(`${new Date().toLocaleString()}: Events before filtering: ${ical[2].length}`);
+
+  ical[2] = ical[2].filter((event, i) => {
+    if (event[0] === 'vevent') {
+      const attendees = event[1].filter((e) => e[0] === 'attendee');
+
+      const me = attendees.find((a) => a[1].cn === user);
+      if (me && me[1].partstat === 'DECLINED') return false;
+
+      const summarySection = event[1].find((e) => e[0] === 'summary');
+
+      if (summarySection) {
+        const summary = summarySection[3];
+        for (const f of filter) {
+          if (summary.toLowerCase().includes(f.toLowerCase())) {
+            return false;
+          }
+        }
+      }
+    }
+
+    return true;
+  });
+
+  const comp = new ICAL.Component(ical);
+  await fs.promises.writeFile(file, comp.toString(), 'utf8');
+
+  console.log(`${new Date().toLocaleString()}: Events after filtering: ${ical[2].length}`);
+}
